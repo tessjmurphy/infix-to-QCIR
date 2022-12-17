@@ -1,4 +1,3 @@
-//DONT CHANGE
 #include <iostream>
 #include <stack>
 #include <algorithm>
@@ -33,9 +32,9 @@ bool isPar(string c) {
 
 int precedence(string c)
 {
-    if (c == "\\/") // acts as and since its flipped
+    if (c == "\\/") // acts as /\ operator since its flipped
         return 3;
-    else if (c == "/\\") //acts as or since its flipped
+    else if (c == "/\\") //acts as \/ operator since its flipped
         return 2;
     else if (c == "~")
         return 1;
@@ -56,96 +55,68 @@ string InfixToPrefix(stack<string> s, string infix)
             infix[i] = '(';
         }
     }
-    int i = 0;
-    while (i < infix.length()) {
-        if (infix[i]== '~') {
+    for (int i = 0; i < infix.length(); i++) {
+        if (infix[i]=='~') {
             prefix +=infix[i];
-        } else if (infix[i] != '/' && infix[i] != '\\' && !isOperator2(infix.substr(i,1)) && !isPar(infix.substr(i,1))){ //|| (infix[i] >= 'A' && infix[i] <= 'Z')) 
-            cout<<infix.substr(i)<<endl;
-            int right = (infix.substr(i)).find("(");
-            int left = (infix.substr(i)).find(")");
-            int backslash = (infix.substr(i).find("\\"));
-            int forwardslash = infix.substr(i).find("/");
-            if (left == -1) 
-                left +=1000;
-            if (right == -1) 
-                right +=1000;
-            if (backslash == -1) 
-                backslash+=1000;
-            if (forwardslash==-1)
-                forwardslash+=1000;
-            if (forwardslash == 999 && backslash == 999 && left == 999 && right == 999) {
-                prefix += infix.substr(i);
-                i = i + (infix.substr(i)).length();
-                
-            } else {
-                int min1 = min(right, left);
-                int min2 = min(backslash, forwardslash);
-                int minimum = min(min1, min2);
-                cout<<"min "<<minimum<<endl;
-                prefix += infix.substr(i, minimum);
-                cout<<"PRE "<<prefix<<endl;
-                string pre = infix.substr(i, minimum);
-                int len = pre.length();
-                cout<<"len "<<len<<endl;
-                i = i + len;
-            }
-            //i = i + 2;
+        // adding variable to prefix
+        } else if (infix[i] != '/' && infix[i] != '\\' && infix[i] != '~' && !isPar(infix.substr(i,1))){ 
+            prefix += infix[i];
         }
         else if (infix[i] == '(') {
             string s1;
             s1 += infix[i];
             s.push(s1);
-            i = i + s.top().length();
+            //i = i + s.top().length();
         }
         else if (infix[i] == ')') {
             while ((s.top() != "(") && (!s.empty())) {
-                prefix += s.top();
+                
+                prefix +=  s.top() ;
+                
                 s.pop();
             }
 
             if (s.top() == "(") {
                 s.pop();
             }
-            i = i + 1;
+            //i = i + 1;
         }
-        else if (isOperator(infix.substr(i,2))) {
-            string prec = infix.substr(i,2);
+        else if (isOperator(infix.substr(i,2)) || isOperator2(infix.substr(i,1))) {
+            int index1;
+            if (isOperator(infix.substr(i,2))) {
+                index1 = 2;
+            } else {
+                index1 = 1;
+            }
+            string prec = infix.substr(i,index1);
             if (s.empty()) {
-                s.push(infix.substr(i,2));
-                i = i + s.top().length();
+                s.push(infix.substr(i,index1));
+                //i +=1;
             }
             else {
-                /*
-                string top = s.top();
-                s.pop();
-                string second = s.top();
-                s.push(top);
-                string topTwo = top + second;
-                //topTwo.push_back(top);
-                //topTwo.push_back(second);
-                */
                 if (precedence(prec) > precedence(s.top())) {
                     s.push(prec);
                 }
                 else if ((precedence(prec) == precedence(s.top()))
                     && (prec == "\\/")) {
                     while ((precedence(prec) == precedence(s.top()))
-                        && ((infix.substr(i,2)) == "\\/")) {
+                        && ((infix.substr(i,index1)) == "\\/")) {
+                        
                         prefix += s.top();
-                        i += s.top().length();
+                        //i += 1;
                         s.pop();
                     }
                     s.push(prec);
                 }
                 else if (precedence(prec) == precedence(s.top())) {
                     s.push(prec);
-                    i += s.top().length();
+                    //i += 1;
                 }
                 else {
                     while ((!s.empty()) && (precedence(prec) < precedence(s.top()))) {
+                        
                         prefix += s.top();
-                        i+= s.top().length();
+                        //i+= 1;
                         s.pop();
                     }
                     s.push(prec);
